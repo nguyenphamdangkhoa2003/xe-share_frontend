@@ -26,7 +26,7 @@ export default async function middleware(req: NextRequest) {
 
     if (isPublicRoute && accessToken) {
         if (path === '/login' || path === '/signup') {
-            return NextResponse.redirect(new URL('/home', req.nextUrl));
+            return NextResponse.redirect(new URL('/', req.nextUrl));
         }
     }
 

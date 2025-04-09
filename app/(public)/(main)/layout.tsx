@@ -1,6 +1,5 @@
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
-import { AuthProvider } from '@/components/providers/auth-provider';
 import TanstackProvider from '@/components/providers/TanstackProvider';
 import { AuthProvider } from '@/context/auth-provider';
 import React from 'react';
