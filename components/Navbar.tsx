@@ -3,35 +3,65 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LogIn, Menu, X } from 'lucide-react';
-import { MdOutlineAdminPanelSettings, MdCalendarToday, MdAccountCircle } from 'react-icons/md';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    MdOutlineAdminPanelSettings,
+    MdCalendarToday,
+    MdAccountCircle,
+} from 'react-icons/md';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { UserType } from '@/context/auth-provider';
+import { useAuthContext } from '@/context/auth-provider';
+import { RoleEnum } from '@/types/enum';
+import { useMutation } from '@tanstack/react-query';
+import { logoutMutationFn } from '@/api/auths/auth';
 
 const Navbar = () => {
     const router = useRouter();
+    const logoutMutation = useMutation({
+        mutationFn: logoutMutationFn,
+        onSuccess: () => {
+            setAuthState({
+                isAuthenticated: false,
+                user: undefined,
+            });
+            router.push('/');
+        },
+    });
+    const { user, isSuccess } = useAuthContext();
     const [isOpen, setIsOpen] = useState(false);
-    
-    // State tùy chỉnh thay cho useSession
-    const [authState, setAuthState] = useState({
+
+    const [authState, setAuthState] = useState<{
+        isAuthenticated: boolean;
+        user: UserType | undefined;
+    }>({
         isAuthenticated: false,
-        user: null as { name: string; image?: string; role?: string } | null
+        user: undefined,
     });
 
-    // Hàm đăng xuất tùy chỉnh
     const customSignOut = () => {
-        setAuthState({
-            isAuthenticated: false,
-            user: null
-        });
-        router.push('/');
+        logoutMutation.mutate();
     };
 
+    useEffect(() => {
+        if (isSuccess) {
+            setAuthState({
+                isAuthenticated: true,
+                user,
+            });
+        } else {
+            setAuthState({
+                isAuthenticated: false,
+                user: undefined,
+            });
+        }
+    }, [isSuccess, user]);
     return (
         <nav
             className="bg-background fixed w-screen z-20 top-0 start-0 border-b shadow-md"
@@ -43,14 +73,14 @@ const Navbar = () => {
                         height={200}
                         width={200}
                         alt="Logo"
-                        className='md:block hidden'
+                        className="md:block hidden"
                     />
                     <Image
                         src="/images/logo.png"
                         height={100}
                         width={150}
                         alt="Logo"
-                        className='md:hidden block'
+                        className="md:hidden block"
                     />
                 </Link>
 
@@ -97,36 +127,56 @@ const Navbar = () => {
                         <div className="flex items-center gap-4">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                                    <Button
+                                        variant="ghost"
+                                        className="relative h-8 w-8 rounded-full">
                                         <div className="flex items-center gap-2">
                                             <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                                                {authState.user?.image ? (
-                                                    <Image 
-                                                        src={authState.user.image} 
-                                                        width={32} 
-                                                        height={32} 
-                                                        alt="Avatar" 
+                                                {authState.user?.avatar ? (
+                                                    <Image
+                                                        src={
+                                                            authState.user
+                                                                .avatar
+                                                        }
+                                                        width={32}
+                                                        height={32}
+                                                        alt="Avatar"
                                                         className="rounded-full"
                                                     />
                                                 ) : (
-                                                    <MdAccountCircle size={24} />
+                                                    <MdAccountCircle
+                                                        size={24}
+                                                    />
                                                 )}
                                             </div>
-                                            <span className="hidden md:inline">{authState.user?.name}</span>
+                                            <span className="hidden md:inline">
+                                                {authState.user?.name}
+                                            </span>
                                         </div>
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56" align="end" forceMount>
-                                    <DropdownMenuItem onClick={() => router.push('/profile')}>
+                                <DropdownMenuContent
+                                    className="w-56"
+                                    align="end"
+                                    forceMount>
+                                    <DropdownMenuItem
+                                        onClick={() => router.push('/profile')}>
                                         <MdAccountCircle className="mr-2 h-4 w-4" />
                                         <span>Hồ sơ</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => router.push('/historybooking')}>
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            router.push('/historybooking')
+                                        }>
                                         <MdCalendarToday className="mr-2 h-4 w-4" />
                                         <span>Lịch sử đặt chỗ</span>
                                     </DropdownMenuItem>
-                                    {authState.user?.role === 'admin' && (
-                                        <DropdownMenuItem onClick={() => router.push('/admin')}>
+                                    {authState.user?.role ===
+                                        RoleEnum.ADMIN && (
+                                        <DropdownMenuItem
+                                            onClick={() =>
+                                                router.push('/admin')
+                                            }>
                                             <MdOutlineAdminPanelSettings className="mr-2 h-4 w-4" />
                                             <span>Trang quản trị</span>
                                         </DropdownMenuItem>
@@ -215,8 +265,7 @@ const Navbar = () => {
                                     router.push('/profile');
                                     setIsOpen(false);
                                 }}
-                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                            >
+                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                                 <MdAccountCircle className="mr-2" />
                                 Hồ sơ
                             </button>
@@ -225,19 +274,17 @@ const Navbar = () => {
                                     router.push('/historybooking');
                                     setIsOpen(false);
                                 }}
-                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                            >
+                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                                 <MdCalendarToday className="mr-2" />
                                 Lịch sử đặt chỗ
                             </button>
-                            {authState.user?.role === 'admin' && (
+                            {authState.user?.role === RoleEnum.ADMIN && (
                                 <button
                                     onClick={() => {
                                         router.push('/admin');
                                         setIsOpen(false);
                                     }}
-                                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                                >
+                                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
                                     <MdOutlineAdminPanelSettings className="mr-2" />
                                     Trang quản trị
                                 </button>

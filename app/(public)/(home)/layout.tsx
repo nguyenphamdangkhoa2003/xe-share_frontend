@@ -1,6 +1,7 @@
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import TanstackProvider from '@/components/providers/TanstackProvider';
+import { AuthProvider } from '@/context/auth-provider';
 import React from 'react';
 
 function Homelayout({
@@ -11,9 +12,11 @@ function Homelayout({
     return (
         <div>
             <TanstackProvider>
-                <Navbar />
-                <main className="flex-grow mt-10 ">{children}</main>
-                <Footer />
+                <AuthProvider>
+                    <Navbar />
+                    <main className="flex-grow mt-10 ">{children}</main>
+                    <Footer />
+                </AuthProvider>
             </TanstackProvider>
         </div>
     );
