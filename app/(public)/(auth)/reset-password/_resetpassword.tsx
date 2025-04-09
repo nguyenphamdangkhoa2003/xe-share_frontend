@@ -71,7 +71,7 @@ export default function ResetPassword() {
         toast("Success",{
           description: "Password reset successfully",
         });
-        router.replace("/");
+        router.replace("/home");
       },
       onError: (error) => {
         console.log(error);

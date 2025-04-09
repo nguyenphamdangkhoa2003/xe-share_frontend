@@ -52,7 +52,7 @@ export default function Login() {
           router.replace(`/verify-mfa?email=${values.email}`);
           return;
         }
-        router.replace(`/`);
+        router.replace(`/home`);
       },
       onError: (error) => {
         toast("Error", {

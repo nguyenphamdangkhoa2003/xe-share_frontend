@@ -1,5 +1,6 @@
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
+import { AuthProvider } from '@/components/providers/auth-provider';
 import TanstackProvider from '@/components/providers/TanstackProvider';
 import React from 'react';
 
@@ -9,6 +10,7 @@ function Homelayout({
     children: React.ReactNode;
 }>) {
     return (
+        <AuthProvider>
         <div>
             <TanstackProvider>
                 <Navbar />
@@ -16,6 +18,7 @@ function Homelayout({
                 <Footer />
             </TanstackProvider>
         </div>
+        </AuthProvider>
     );
 }
 

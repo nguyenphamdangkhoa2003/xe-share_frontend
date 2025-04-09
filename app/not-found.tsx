@@ -19,7 +19,7 @@ export default function NotFound() {
                         explore on the home page.{' '}
                     </p>
                     <Button
-                        onClick={() => router.push('/')}
+                        onClick={() => router.push('/home')}
                         className="cursor-pointer">
                         Back to Homepage
                     </Button>
