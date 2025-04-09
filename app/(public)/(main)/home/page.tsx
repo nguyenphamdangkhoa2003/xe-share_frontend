@@ -1,5 +1,7 @@
 import Banner from '@/components/Banner';
+import EnableMfa from '@/components/EnableMfa';
 import SearchTrip from '@/components/form/SearchTrip';
+import Sessions from '@/components/Sessions';
 import Image from 'next/image';
 
 export default function Home() {
@@ -87,6 +89,12 @@ export default function Home() {
                         </p>
                     </div>
                 </div>
+            </div>
+            <div>
+              <EnableMfa />
+            </div>
+            <div>
+              <Sessions />
             </div>
         </div>
     );

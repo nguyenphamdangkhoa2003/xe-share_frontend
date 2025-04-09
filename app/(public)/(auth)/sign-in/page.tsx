@@ -22,9 +22,47 @@ import { useState } from 'react';
 import { FcGoogle } from 'react-icons/fc'; // Thêm icon Google
 
 export default function Login() {
-    const router = useRouter();
-    const { mutate, isPending } = useMutation({
-        mutationFn: loginMutationFn,
+  const router = useRouter();
+  const { mutate, isPending } = useMutation({
+    mutationFn: loginMutationFn,
+  });
+  const [showPassword, setShowPassword] = useState(false);
+
+  const formSchema = z.object({
+    email: z.string().trim().email().min(1, {
+      message: "Email is required",
+    }),
+    password: z.string().trim().min(1, {
+      message: "Password is required",
+    }),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    mutate(values, {
+      onSuccess: (response) => {
+        if (response.data.mfaRequired) {
+          router.replace(`/verify-mfa?email=${values.email}`);
+          return;
+        }
+        router.replace(`/home`);
+      },
+      onError: (error) => {
+        toast("Error", {
+          description: error.message,
+          style: {
+            background: "#ef4444",
+            color: "#fff",
+          },
+        });
+      },
     });
 
     const [showPassword, setShowPassword] = useState(false);
